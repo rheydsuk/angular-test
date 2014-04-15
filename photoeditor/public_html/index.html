@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html ng-app="editor">
+    <head>
+        <title>Photo Editor</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <!--    jquery      -->
+        <script type="text/javascript" src="js/libs/jquery/jquery.js"></script>
+        <!--    angular     --> 
+        <script type="text/javascript" src="js/libs/angular.js/angular.js"></script>
+        <!--    bootstrap   -->
+        <link rel="stylesheet" type="text/css" href="js/libs/twitter-bootstrap/css/bootstrap.css" />
+        <script type="text/javascript" src="js/libs/twitter-bootstrap/js/bootstrap.js"></script>
+        <!--    holder  -->
+        <script type="text/javascript" src="js/libs/holder/holder.js"></script>
+        <!--    page listing module     -->
+        <script type="text/javascript" src="js/modules/editor.js"></script>
+    </head>
+    <body>
+        <div class="container-fluid" ng-controller="PageListingController">
+            <div class="row" style="padding: 10px;background-color: #eee">
+                <div class="col-xs-6 col-md-2" ng-repeat="page in pages" style="padding-bottom: 10px">
+                    <a href="javascript:void(0)" class="thumbnail" style="height: 110px">
+                        <div style="text-align: center;float: left;width: 50%;border-right: 1px solid #ccc;">
+                            <img ng-src="{{page.left.photo}}" style="max-height: 100px;">
+                        </div>
+                        <div style="text-align: center;float: right;width: 49%">
+                            <img ng-src="{{page.right.photo}}" style="max-height: 100px">
+                        </div>
+                    </a>
+                 </div>
+            </div>
+        </div>
+    </body>
+</html>
