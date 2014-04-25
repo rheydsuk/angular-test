@@ -1,0 +1,10 @@
+.drag-over{
+    border: 1px dashed #000;
+}
+.listview-default{
+    overflow: hidden; 
+    height: 130px 
+}
+.listview-all{
+     
+}
