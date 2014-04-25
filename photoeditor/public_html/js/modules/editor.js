@@ -5,7 +5,12 @@ editor.factory('pages',function(){
         {title:'First page',photo:'images/1.png'},
         {title:'Second page',photo:'images/2.jpg'},
         {title:'Third page',photo:'images/2.jpg'},
+        {title:'Third page',photo:'images/1.png'},
         {title:'Third page',photo:'images/2.jpg'},
+        {title:'Third page',photo:'images/1.png'},
+        {title:'Third page',photo:'images/2.jpg'},
+        {title:'Third page',photo:'images/2.jpg'},
+        {title:'Third page',photo:'images/1.png'},
         {title:'Third page',photo:'images/2.jpg'},
         {title:'Third page',photo:'images/2.jpg'},
         {title:'Third page',photo:'images/2.jpg'},
@@ -33,7 +38,9 @@ editor.controller('PageListingController',['$scope','pages',function(scope,pages
         });
         return formattedPages;
     }
-    scope.pages         =   formatPages(pages);
+    scope.pages         =   formatPages(pages); //  formatted pages
+    scope.viewClass     =   'listview-default'; //  class for view type
+    scope.viewArrow     =   'down';             //  class to add in glyp
     //  arrange page
     scope.arrange   =   function(source,dest){
         var sourcePage  =   pages[source];
@@ -42,6 +49,16 @@ editor.controller('PageListingController',['$scope','pages',function(scope,pages
         pages[source]   =   destPage;
         scope.pages     =   formatPages(pages);
     }    
+    //  switch view toogle
+    scope.switchList    =   function(){
+        if(scope.viewArrow=='up'){
+            scope.viewArrow     =   'down';
+            scope.viewClass     =   'listview-default';
+        }else{
+            scope.viewArrow     =   'up';
+            scope.viewClass     =   'listview-all';
+        }
+    }
 }]);
 // drag image
 editor.directive('imagedrag',function(){
