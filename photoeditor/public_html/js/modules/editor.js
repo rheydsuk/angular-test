@@ -26,63 +26,6 @@ editor.factory('pages',function(){
     ];
     return pages;
 });
-//  loading page list
-editor.controller('PageListingController',['$scope','pages',function(scope,pages){
-    //  format pages
-    var formatPages     =   function(pages){
-        var formattedPages  =   [];
-        var key             =   0;
-        pages.forEach(function(entry,id){
-            if(id%2==0){
-                formattedPages[key]    =   {};
-                formattedPages[key]['left']   =   entry;
-            }else{
-                formattedPages[key]['right']   =   entry;
-                key++;
-            }
-        });
-        return formattedPages;
-    }
-    scope.pages             =   formatPages(pages); //  formatted pages
-    scope.viewClass         =   'listview-default'; //  class for view type
-    scope.viewArrow         =   'down';             //  class to add in glypicon
-    scope.addPhotoHandle    =   'hide';             //  toggle add page from external image
-    scope.activePage        =   scope.pages[0];
-    //  arrange page
-    scope.arrange       =   function(source,dest){
-        var sourcePage  =   pages[source];
-        var destPage    =   pages[dest];
-        pages[dest]     =   sourcePage;
-        pages[source]   =   destPage;
-        scope.pages     =   formatPages(pages);
-    }    
-    scope.addPage       =   function(field,value){
-        var newPage     =   {
-            title       :   'New Page'
-        };
-        newPage[field]  =   value;
-        pages.splice(0,0,newPage);
-        scope.pages     =   formatPages(pages);
-    }
-    //  add photo page handle
-    scope.showAddPhotoPage      =   function(){
-        scope.addPhotoHandle    =   '';
-    }
-    scope.hideAddPhotoPage      =   function(){
-        scope.addPhotoHandle    =   'hide';
-    }
-    
-    //  switch view toogle
-    scope.switchList    =   function(){
-        if(scope.viewArrow=='up'){
-            scope.viewArrow     =   'down';
-            scope.viewClass     =   'listview-default';
-        }else{
-            scope.viewArrow     =   'up';
-            scope.viewClass     =   'listview-all';
-        }
-    }
-}]);
 // drag image
 editor.directive('imagedrag',function(){
     return {
@@ -171,73 +114,6 @@ editor.directive('dropexternalimage',function(){
         }
     }
 });
-//  editor controller
-editor.controller('EditorController',['$scope','pages',function(scope,pages){
-        scope.editorStage   =   {};
-         var fitToPage   =   function(imageObject,maxWidth,maxHeight,direction){
-            var height              =   imageObject.height;
-            var width               =   imageObject.width;
-            var x                   =   0;
-            var y                   =   0;
-            var resizePercent       =   0;
-            if(direction=='x'){
-                resizePercent       =   maxWidth/width;
-                width               =   maxWidth;
-                height              =   height*resizePercent;
-            }
-            if(direction=='y'){
-                resizePercent       =   maxHeight/height;
-                height              =   maxHeight;
-                width               =   width*resizePercent;
-            }
-            x                       =   (maxWidth-width)/2;
-            y                       =   (maxHeight-height)/2;
-            resizePercent           =   (resizePercent*100);
-            return  {
-                'x'                 :   x,
-                'y'                 :   y,
-                'height'            :   height,
-                'width'             :   width,
-                'defaultPercent'    :   resizePercent
-            };
-        }
-        //  loading left page
-        if(scope.activePage.left){
-            var leftImageObj        =   new Image();   
-            leftImageObj.src        =   scope.activePage.left.photo;
-            leftImageObj.onload     =   function(){
-                var settings        =   {
-                    image       :   leftImageObj,
-                    draggable   :   true
-                }
-                if(scope.activePage.left.settings==false){
-                    settings    =   $.extend(settings,fitToPage(leftImageObj,scope.editorStage['leftpage'].width(),scope.editorStage['leftpage'].height(),'x'));
-                }else{
-                    settings    =   scope.activePage.left.settings;
-                }
-                var layer       =   new Kinetic.Layer();
-                var userPhoto   =   new Kinetic.Image(settings);
-                layer.add(userPhoto);
-                scope.editorStage['leftpage'].add(layer);
-            }
-        }
-        //  loading right page
-        if(scope.activePage.right){
-            var rightImageObj       =   new Image();   
-            rightImageObj.src       =   scope.activePage.right.photo;
-            rightImageObj.onload    =   function(){
-                var layer           =   new Kinetic.Layer();
-                var userPhoto       =   new Kinetic.Image({
-                    image       :   rightImageObj,
-                    width       :   100,
-                    height      :   100,
-                    draggable   :   true
-                });
-                layer.add(userPhoto);
-                scope.editorStage['rightpage'].add(layer);
-            }
-        }
-}]);
 //  photo container
 editor.directive('photopreview',function(){
     return {
@@ -255,6 +131,139 @@ editor.directive('photopreview',function(){
                 width       : width,
                 height      : height
             });
+            scope.loadPage();
+            
         }
     }
 });
+//  loading page list
+editor.controller('PageListingController',['$scope','pages',function(scope,pages){
+    //  format pages
+    var formatPages     =   function(pages){
+        var formattedPages  =   [];
+        var key             =   0;
+        pages.forEach(function(entry,id){
+            if(id%2==0){
+                formattedPages[key]    =   {};
+                formattedPages[key]['left']   =   entry;
+            }else{
+                formattedPages[key]['right']   =   entry;
+                key++;
+            }
+        });
+        return formattedPages;
+    }
+    scope.pages             =   formatPages(pages); //  formatted pages
+    scope.viewClass         =   'listview-default'; //  class for view type
+    scope.viewArrow         =   'down';             //  class to add in glypicon
+    scope.addPhotoHandle    =   'hide';             //  toggle add page from external image
+    //  arrange page
+    scope.arrange       =   function(source,dest){
+        var sourcePage  =   pages[source];
+        var destPage    =   pages[dest];
+        pages[dest]     =   sourcePage;
+        pages[source]   =   destPage;
+        scope.pages     =   formatPages(pages);
+    }    
+    scope.addPage       =   function(field,value){
+        var newPage     =   {
+            title       :   'New Page'
+        };
+        newPage[field]  =   value;
+        pages.splice(0,0,newPage);
+        scope.pages     =   formatPages(pages);
+    }
+    //  add photo page handle
+    scope.showAddPhotoPage      =   function(){
+        scope.addPhotoHandle    =   '';
+    }
+    scope.hideAddPhotoPage      =   function(){
+        scope.addPhotoHandle    =   'hide';
+    }
+    
+    //  switch view toogle
+    scope.switchList    =   function(){
+        if(scope.viewArrow=='up'){
+            scope.viewArrow     =   'down';
+            scope.viewClass     =   'listview-default';
+        }else{
+            scope.viewArrow     =   'up';
+            scope.viewClass     =   'listview-all';
+        }
+    }
+}]);
+//  editor controller
+editor.controller('EditorController',['$scope','pages',function(scope,pages){
+        scope.editorStage       =   {};
+        var fitToPage           =   function(imageObject,maxWidth,maxHeight,direction){
+           var height              =   imageObject.height;
+           var width               =   imageObject.width;
+           var x                   =   0;
+           var y                   =   0;
+           var resizePercent       =   0;
+           if(direction=='x'){
+               resizePercent       =   maxWidth/width;
+               width               =   maxWidth;
+               height              =   height*resizePercent;
+           }
+           if(direction=='y'){
+               resizePercent       =   maxHeight/height;
+               height              =   maxHeight;
+               width               =   width*resizePercent;
+           }
+           x                       =   (maxWidth-width)/2;
+           y                       =   (maxHeight-height)/2;
+           resizePercent           =   (resizePercent*100);
+           return  {
+               'x'                 :   x,
+               'y'                 :   y,
+               'height'            :   height,
+               'width'             :   width,
+               'defaultPercent'    :   resizePercent
+           };
+       }
+       
+        scope.loadPage  =   function(){
+            var activePage          =   scope.pages[0];
+            //  loading left page
+            if(activePage.left){
+                var leftImageObj        =   new Image();   
+                leftImageObj.src        =   activePage.left.photo;
+                leftImageObj.onload     =   function(){
+                    var settings        =   {
+                        image       :   leftImageObj,
+                        draggable   :   true
+                    }
+                    if(activePage.left.settings==false){
+                        settings    =   $.extend(settings,fitToPage(leftImageObj,scope.editorStage.leftpage.width(),scope.editorStage.leftpage.height(),'x'));
+                    }else{
+                        settings    =   activePage.left.settings;
+                    }
+                    var layer       =   new Kinetic.Layer();
+                    var userPhoto   =   new Kinetic.Image(settings);
+                    layer.add(userPhoto);
+                    scope.editorStage.leftpage.add(layer);
+                }
+            }
+            //  loading right page
+            if(activePage.right){
+                var rightImageObj       =   new Image();   
+                rightImageObj.src       =   activePage.right.photo;
+                rightImageObj.onload    =   function(){
+                    var settings        =   {
+                        image       :   rightImageObj,
+                        draggable   :   true
+                    }
+                    if(activePage.right.settings==false){
+                        settings    =   $.extend(settings,fitToPage(rightImageObj,scope.editorStage.rightpage.width(),scope.editorStage.rightpage.height(),'x'));
+                    }else{
+                        settings    =   activePage.right.settings;
+                    }
+                    var layer           =   new Kinetic.Layer();
+                    var userPhoto       =   new Kinetic.Image(settings);
+                    layer.add(userPhoto);
+                    scope.editorStage.rightpage.add(layer);
+                }
+            }
+        }
+}]);
