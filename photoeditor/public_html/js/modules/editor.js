@@ -2,27 +2,27 @@ var editor = angular.module('editor', []);
 //  page models
 editor.factory('pages',function(){
     var pages   = [
-        {title:'First page',photo:'images/1.png'},
-        {title:'Second page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/1.png'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/1.png'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/1.png'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'},
-        {title:'Third page',photo:'images/2.jpg'}
+        {title:'First page',photo:'images/1.png',settings:false},
+        {title:'Second page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/1.png',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/1.png',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/1.png',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false},
+        {title:'Third page',photo:'images/2.jpg',settings:false}
     ];
     return pages;
 });
@@ -173,7 +173,70 @@ editor.directive('dropexternalimage',function(){
 });
 //  editor controller
 editor.controller('EditorController',['$scope','pages',function(scope,pages){
-        
+        scope.editorStage   =   {};
+         var fitToPage   =   function(imageObject,maxWidth,maxHeight,direction){
+            var height              =   imageObject.height;
+            var width               =   imageObject.width;
+            var x                   =   0;
+            var y                   =   0;
+            var resizePercent       =   0;
+            if(direction=='x'){
+                resizePercent       =   maxWidth/width;
+                width               =   maxWidth;
+                height              =   height*resizePercent;
+            }
+            if(direction=='y'){
+                resizePercent       =   maxHeight/height;
+                height              =   maxHeight;
+                width               =   width*resizePercent;
+            }
+            x                       =   (maxWidth-width)/2;
+            y                       =   (maxHeight-height)/2;
+            resizePercent           =   (resizePercent*100);
+            return  {
+                'x'                 :   x,
+                'y'                 :   y,
+                'height'            :   height,
+                'width'             :   width,
+                'defaultPercent'    :   resizePercent
+            };
+        }
+        //  loading left page
+        if(scope.activePage.left){
+            var leftImageObj        =   new Image();   
+            leftImageObj.src        =   scope.activePage.left.photo;
+            leftImageObj.onload     =   function(){
+                var settings        =   {
+                    image       :   leftImageObj,
+                    draggable   :   true
+                }
+                if(scope.activePage.left.settings==false){
+                    settings    =   $.extend(settings,fitToPage(leftImageObj,scope.editorStage['leftpage'].width(),scope.editorStage['leftpage'].height(),'x'));
+                }else{
+                    settings    =   scope.activePage.left.settings;
+                }
+                var layer       =   new Kinetic.Layer();
+                var userPhoto   =   new Kinetic.Image(settings);
+                layer.add(userPhoto);
+                scope.editorStage['leftpage'].add(layer);
+            }
+        }
+        //  loading right page
+        if(scope.activePage.right){
+            var rightImageObj       =   new Image();   
+            rightImageObj.src       =   scope.activePage.right.photo;
+            rightImageObj.onload    =   function(){
+                var layer           =   new Kinetic.Layer();
+                var userPhoto       =   new Kinetic.Image({
+                    image       :   rightImageObj,
+                    width       :   100,
+                    height      :   100,
+                    draggable   :   true
+                });
+                layer.add(userPhoto);
+                scope.editorStage['rightpage'].add(layer);
+            }
+        }
 }]);
 //  photo container
 editor.directive('photopreview',function(){
@@ -186,30 +249,12 @@ editor.directive('photopreview',function(){
             var height  =   (width/11)*8;
             el.css('height',height+'px');
             //  initialise editor
-            if (!scope.kineticStageObj) {
-                scope.kineticStageObj = new Kinetic.Stage({
-                    container   : el.attr('id'),
-                    width       : width,
-                    height      : height
-                });
-                var imageObj    =   new Image();
-                imageObj.src    =   scope.activePage.left.photo;
-                imageObj.onload =   function(){
-                    var layer           =   new Kinetic.Layer();
-                   var options = {
-                        x: 0,
-                        y: 0,
-                        width: 100,
-                        height: 50,
-                        fill: '#00D2FF',
-                        stroke: 'black',
-                        strokeWidth: 4,
-                    };
-                    scope.kineticObj = new Kinetic.Rect(options);
-                    layer.add(scope.kineticObj);
-                    scope.kineticStageObj.add(layer);
-                }
-            }
+            var id  =   el.attr('id');
+            scope.editorStage[id]   =   new Kinetic.Stage({
+                container   : id,
+                width       : width,
+                height      : height
+            });
         }
     }
 });
