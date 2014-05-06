@@ -21,3 +21,35 @@
 .no-padding{
     padding: 0px;
 }
+.activepage{
+    border: 1px solid green;
+}
+.editor-leftborder{
+    background: #fcfcfc;
+    border-top: 10px solid #3e3e3e!important;
+    border-left: 10px solid #3e3e3e!important;
+    border-bottom: 10px solid #3e3e3e!important;
+    border-right: 5px solid #3e3e3e!important;
+    -webkit-border-top-left-radius: 20px!important;
+    -webkit-border-bottom-left-radius: 20px!important;
+    -moz-border-radius-topleft: 20px!important;
+    -moz-border-radius-bottomleft: 20px!important;
+    border-top-left-radius: 20px!important;
+    border-bottom-left-radius: 20px!important;
+    border-right: none;
+}
+.editor-rightborder{
+    /*margin: 0 0 10px -7px;*/
+    background: #fcfcfc;
+    border-top: 10px solid #3e3e3e!important;
+    border-left: 5px solid #3e3e3e!important;
+    border-bottom: 10px solid #3e3e3e!important;
+    border-right: 10px solid #3e3e3e!important;
+    -webkit-border-top-right-radius: 20px!important;
+    -webkit-border-bottom-right-radius: 20px!important;
+    -moz-border-radius-topright: 20px!important;
+    -moz-border-radius-bottomright: 20px!important;
+    border-top-right-radius: 20px!important;
+    border-bottom-right-radius: 20px!important;
+    border-left: none;
+}
